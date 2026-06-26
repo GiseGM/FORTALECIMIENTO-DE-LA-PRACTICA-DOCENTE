@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador de Planeación Didáctica</title>
+<style>
+body{font-family:Arial;max-width:1200px;margin:auto;padding:20px}
+.card{border:1px solid #ccc;border-radius:8px;padding:15px;margin:10px 0}
+.progress{width:100%;background:#eee;border-radius:20px}
+.bar{height:28px;width:0%;background:#2e7d32;color:#fff;text-align:center;border-radius:20px;line-height:28px}
+select,input{padding:6px;margin:4px}
+.result{padding:15px;border:1px solid #999;margin-top:15px}
+</style>
+</head>
+<body>
+<h1>🎓 Simulador de Autoevaluación de Planeación Didáctica</h1>
+<p>Complete los datos y valore cada criterio. El sistema calculará automáticamente su nivel de calidad y emitirá recomendaciones.</p>
+
+<div class="card">
+<b>Nombre del docente:</b><br><input id="docente" size="50"><br>
+<b>Asignatura:</b><br><input id="asignatura" size="50"><br>
+<b>Programa:</b><br><input id="programa" size="50">
+</div>
+
+<div class="progress"><div class="bar" id="bar">0%</div></div>
+
+<div id="preguntas"></div>
+
+<button onclick="evaluar()">Evaluar Planeación</button>
+<button onclick="window.print()">Generar Reporte PDF</button>
+
+<div id="resultado" class="result"></div>
+
+<script>
+const items=[
+["Alineación","El resultado de aprendizaje está redactado con verbo observable."],
+["Alineación","Existe coherencia entre RAP, actividades y evaluación."],
+["Contenidos","Los contenidos son pertinentes y suficientes."],
+["Contenidos","Existe secuencia lógica de aprendizaje."],
+["Metodología","Se utilizan estrategias de aprendizaje activo."],
+["Metodología","Los estudiantes aplican conocimientos en actividades prácticas."],
+["Secuencia","Se contemplan actividades de inicio."],
+["Secuencia","Se contemplan actividades de desarrollo."],
+["Secuencia","Se contemplan actividades de cierre."],
+["Evaluación","Existe evidencia clara de aprendizaje."],
+["Evaluación","Cuenta con rúbrica o lista de cotejo."],
+["Evaluación","Se contempla retroalimentación formativa."],
+["DUA","Existen múltiples formas de representación."],
+["DUA","Existen múltiples formas de expresión."],
+["Recursos","Los recursos tecnológicos son adecuados."],
+["Recursos","Existe un plan B ante contingencias."]
+];
+
+let html="";
+items.forEach((x,i)=>{
+ html+=`<div class='card'><b>${x[0]}</b><br>${x[1]}
+ <br><select id='i${i}'>
+ <option value='0'>No cumple</option>
+ <option value='0.5'>En proceso</option>
+ <option value='1'>Cumple</option>
+ </select></div>`;
+});
+document.getElementById("preguntas").innerHTML=html;
+
+function evaluar(){
+ let total=0;
+ for(let i=0;i<items.length;i++){
+   total += parseFloat(document.getElementById('i'+i).value);
+ }
+ let pct=Math.round((total/items.length)*100);
+ document.getElementById('bar').style.width=pct+'%';
+ document.getElementById('bar').innerHTML=pct+'%';
+
+ let nivel="";
+ if(pct>=90) nivel="Excelente";
+ else if(pct>=80) nivel="Bueno";
+ else if(pct>=70) nivel="Aceptable";
+ else nivel="Requiere mejoras";
+
+ let recomendaciones=[];
+ if(pct<90) recomendaciones.push("Fortalecer la alineación entre resultados, actividades y evaluación.");
+ if(pct<80) recomendaciones.push("Incrementar actividades activas y evidencias auténticas.");
+ if(pct<70) recomendaciones.push("Revisar la estructura didáctica completa y los criterios de evaluación.");
+
+ document.getElementById('resultado').innerHTML=`
+ <h2>Reporte del Simulador</h2>
+ <p><b>Docente:</b> ${document.getElementById('docente').value}</p>
+ <p><b>Asignatura:</b> ${document.getElementById('asignatura').value}</p>
+ <p><b>Resultado global:</b> ${pct}%</p>
+ <p><b>Nivel:</b> ${nivel}</p>
+ <h3>Recomendaciones</h3>
+ <ul>${recomendaciones.map(r=>'<li>'+r+'</li>').join('')}</ul>`;
+}
+</script>
+</body>
+</html>
